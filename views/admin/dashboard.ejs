@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Earth Resources Engineers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            background: #1f3d2b;
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .admin-sidebar .logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-sidebar .logo h3 {
+            font-size: 1.2rem;
+            color: #e2d8c0;
+        }
+
+        .admin-sidebar .logo p {
+            font-size: 0.8rem;
+            color: #b48b5a;
+        }
+
+        .admin-nav {
+            list-style: none;
+        }
+
+        .admin-nav li {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .admin-nav li:hover,
+        .admin-nav li.active {
+            background: #2b5631;
+            border-left-color: #b48b5a;
+        }
+
+        .admin-nav li i {
+            margin-right: 0.8rem;
+            width: 20px;
+        }
+
+        .admin-main {
+            background: #f5f2e9;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #b48b5a;
+        }
+
+        .admin-header h2 {
+            color: #1f3d2b;
+        }
+
+        .logout-btn {
+            background: #6b4f3a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #b48b5a;
+        }
+
+        .admin-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #e2d8c0;
+        }
+
+        .data-table th {
+            background: #1f3d2b;
+            color: white;
+        }
+
+        .data-table tr:hover {
+            background: #f5f2e9;
+        }
+
+        .btn-add {
+            background: #1f3d2b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 0 0.2rem;
+        }
+
+        .btn-edit {
+            background: #b48b5a;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            color: #1f3d2b;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #1f3d2b;
+            font-weight: 600;
+        }
+
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e2d8c0;
+            border-radius: 5px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-save {
+            background: #1f3d2b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .btn-cancel {
+            background: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .skill-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-item {
+            background: #e2d8c0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .skill-item.selected {
+            background: #1f3d2b;
+            color: white;
+        }
+
+        .stats-card {
+            background: #1f3d2b;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stats-card h4 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card p {
+            color: #e2d8c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="logo">
+                <h3>EARTH RESOURCES ENGINEERS</h3>
+                <p>leveraging limited · admin</p>
+            </div>
+            <ul class="admin-nav">
+                <li class="active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </li>
+                <li data-tab="team">
+                    <i class="fas fa-users"></i> Team Members
+                </li>
+                <li data-tab="gallery">
+                    <i class="fas fa-images"></i> Gallery
+                </li>
+                <li data-tab="messages">
+                    <i class="fas fa-envelope"></i> Messages
+                </li>
+                <li data-tab="services">
+                    <i class="fas fa-cog"></i> Services
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="admin-header">
+                <h2 id="page-title">Dashboard</h2>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <div class="admin-content">
+                <!-- Dashboard Tab -->
+                <div id="dashboard-tab" class="tab-content active">
+                    <h3>Welcome, <%= username || 'Admin' %></h3>
+                    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                        <div class="stats-card">
+                            <h4 id="total-team">0</h4>
+                            <p>Team Members</p>
+                        </div>
+                        <div class="stats-card">
+                            <h4 id="total-gallery">0</h4>
+                            <p>Gallery Items</p>
+                        </div>
+                        <div class="stats-card">
+                            <h4 id="total-messages">0</h4>
+                            <p>Unread Messages</p>
+                        </div>
+                        <div class="stats-card">
+                            <h4 id="total-services">5</h4>
+                            <p>Services</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Tab -->
+                <div id="team-tab" class="tab-content">
+                    <h3>Team Members</h3>
+                    <button class="btn-add" onclick="showAddTeamModal()">
+                        <i class="fas fa-plus"></i> Add Team Member
+                    </button>
+                    <table class="data-table" id="team-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Title</th>
+                                <th>Email</th>
+                                <th>Skills</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team-table-body">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Gallery Tab -->
+                <div id="gallery-tab" class="tab-content">
+                    <h3>Gallery Items</h3>
+                    <button class="btn-add" onclick="showAddGalleryModal()">
+                        <i class="fas fa-plus"></i> Add Gallery Item
+                    </button>
+                    <table class="data-table" id="gallery-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Preview</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gallery-table-body">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Messages Tab -->
+                <div id="messages-tab" class="tab-content">
+                    <h3>Contact Messages</h3>
+                    <table class="data-table" id="messages-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Service</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table-body">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Services Tab -->
+                <div id="services-tab" class="tab-content">
+                    <h3>Services</h3>
+                    <table class="data-table" id="services-table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Icon</th>
+                                <th>Description</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-table-body">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Team Member Modal -->
+    <div id="team-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="team-modal-title">Add Team Member</h3>
+            <form id="team-form">
+                <input type="hidden" id="team-id" name="id">
+                
+                <div class="form-group">
+                    <label for="team-name">Name</label>
+                    <input type="text" id="team-name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="team-title">Title</label>
+                    <input type="text" id="team-title" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="team-email">Email</label>
+                    <input type="email" id="team-email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="team-bio">Bio</label>
+                    <textarea id="team-bio" name="bio" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Skills</label>
+                    <div class="skill-selector" id="skills-container">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="team-status">Status</label>
+                    <select id="team-status" name="is_active">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">Save</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal('team-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is authenticated
+        async function checkAuth() {
+            try {
+                const response = await fetch('/admin/check-auth');
+                const data = await response.json();
+                if (!data.success) {
+                    window.location.href = '/admin-login';
+                }
+            } catch (error) {
+                window.location.href = '/admin-login';
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            await fetch('/admin/logout', { method: 'POST' });
+            window.location.href = '/admin-login';
+        }
+
+        // Tab switching
+        document.querySelectorAll('.admin-nav li').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.admin-nav li').forEach(li => li.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                document.getElementById('page-title').textContent = this.textContent.trim();
+                
+                // Load data for the tab
+                switch(tabName) {
+                    case 'dashboard':
+                        loadDashboardStats();
+                        break;
+                    case 'team':
+                        loadTeamMembers();
+                        break;
+                    case 'gallery':
+                        loadGalleryItems();
+                        break;
+                    case 'messages':
+                        loadMessages();
+                        break;
+                    case 'services':
+                        loadServices();
+                        break;
+                }
+            });
+        });
+
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                const teamRes = await fetch('/api/team');
+                const team = await teamRes.json();
+                document.getElementById('total-team').textContent = team.data?.length || 0;
+
+                const galleryRes = await fetch('/api/gallery');
+                const gallery = await galleryRes.json();
+                document.getElementById('total-gallery').textContent = gallery.data?.length || 0;
+
+                // For messages, you'd need a separate endpoint
+                document.getElementById('total-messages').textContent = '0';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load team members
+        async function loadTeamMembers() {
+            try {
+                const response = await fetch('/admin/team');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const tbody = document.getElementById('team-table-body');
+                    tbody.innerHTML = result.data.map(member => `
+                        <tr>
+                            <td>${member.name}</td>
+                            <td>${member.title}</td>
+                            <td>${member.email || '-'}</td>
+                            <td>${member.skills?.map(s => s.skill_name).join(', ') || ''}</td>
+                            <td><span class="status-badge ${member.is_active ? 'status-active' : 'status-inactive'}">${member.is_active ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <button class="btn-edit" onclick="editTeamMember(${member.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn-delete" onclick="deleteTeamMember(${member.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading team:', error);
+            }
+        }
+
+        // Modal functions
+        function showAddTeamModal() {
+            document.getElementById('team-modal-title').textContent = 'Add Team Member';
+            document.getElementById('team-form').reset();
+            document.getElementById('team-id').value = '';
+            document.getElementById('team-modal').classList.add('active');
+            loadSkills();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Load skills for the skill selector
+        async function loadSkills() {
+            try {
+                const response = await fetch('/api/skills');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const container = document.getElementById('skills-container');
+                    container.innerHTML = result.data.map(skill => `
+                        <span class="skill-item" data-skill-id="${skill.id}" onclick="toggleSkill(this)">
+                            ${skill.name}
+                        </span>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading skills:', error);
+            }
+        }
+
+        function toggleSkill(element) {
+            element.classList.toggle('selected');
+        }
+
+        // Handle team form submission
+        document.getElementById('team-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('team-name').value);
+            formData.append('title', document.getElementById('team-title').value);
+            formData.append('email', document.getElementById('team-email').value);
+            formData.append('bio', document.getElementById('team-bio').value);
+            formData.append('is_active', document.getElementById('team-status').value);
+            
+            // Get selected skills
+            const selectedSkills = Array.from(document.querySelectorAll('.skill-item.selected')).map(el => ({
+                id: el.dataset.skillId,
+                proficiency: 'intermediate'
+            }));
+            formData.append('skills', JSON.stringify(selectedSkills));
+            
+            const id = document.getElementById('team-id').value;
+            const url = id ? `/admin/team/${id}` : '/admin/team';
+            const method = id ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    closeModal('team-modal');
+                    loadTeamMembers();
+                }
+            } catch (error) {
+                console.error('Error saving team member:', error);
+            }
+        });
+
+        // Delete team member
+        async function deleteTeamMember(id) {
+            if (confirm('Are you sure you want to delete this team member?')) {
+                try {
+                    const response = await fetch(`/admin/team/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        loadTeamMembers();
+                    }
+                } catch (error) {
+                    console.error('Error deleting team member:', error);
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadDashboardStats();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
+    </script>
+</body>
+</html>
