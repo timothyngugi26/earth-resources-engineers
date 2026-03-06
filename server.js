@@ -61,3 +61,34 @@ pool.connect((err, client, release) => {
 });
 
 // ... rest of your server.js continues here ...
+
+// ============= SERVER START =============
+const PORT = process.env.PORT || 3000;
+console.log('🔧 Attempting to start server on port:', PORT);
+
+try {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ SUCCESS! Server running on port ${PORT}`);
+        console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
+    });
+
+    server.on('error', (error) => {
+        console.error('❌ Server error:', error);
+    });
+
+} catch (error) {
+    console.error('❌ Failed to start server:', error);
+}
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+        console.log('HTTP server closed');
+        pool.end(() => {
+            console.log('Database pool closed');
+            process.exit(0);
+        });
+    });
+});
