@@ -18,7 +18,7 @@ app.use('/api', apiRoutes);
 app.use('/admin', adminRoutes);
 
 // ============= HTML PAGE ROUTES =============
-// Serve the main frontend from views folder
+// Serve the main frontend from views folder - ONLY ONCE!
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -29,17 +29,6 @@ app.get('/admin-login', (req, res) => {
     } else {
         res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
     }
-});
-
-// ============= SERVE FRONTEND =============
-// Serve the main HTML page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-// Serve admin login page
-app.get('/admin-login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
 });
 
 // ============= 404 HANDLER =============
