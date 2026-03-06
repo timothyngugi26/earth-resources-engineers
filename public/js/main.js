@@ -1,3 +1,22 @@
+// ==================== AUTO-DETECT API BASE URL ====================
+// This automatically works for both local development and production
+const API_BASE_URL = ''; // Keep empty - uses same origin
+
+// Optional: Add this to verify the API is reachable
+async function checkAPIHealth() {
+    try {
+        const response = await fetch('/api/health');
+        if (response.ok) {
+            console.log('✅ API is healthy and connected');
+            return true;
+        }
+    } catch (error) {
+        console.log('⚠️ API not reachable, using mock data');
+        return false;
+    }
+}
+
+
 // API Service for Earth Resources Engineers - Render Compatible
 // With mock data fallback for when backend is still setting up
 
